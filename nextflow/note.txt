@@ -1,0 +1,104 @@
+///////
+docker run \
+  -v /mwa/mwa-1165080856:/mwa-1165080856 \
+  --gpus all \
+  cirapulsarsandtransients/vcstools:v2.6 \
+  make_beam \
+  -o 1165080856 \
+  -b 1165080863 \
+  -e 1165080865 \
+  -P "06:30:49.40_-28:34:42.77" \
+  -z 2016-12-06T17:34:42 \
+  -d /mwa-1165080856 \
+  -f 132 \
+  -m /mwa-1165080856/cal/1165080856_metafits_ppds.fits \
+  -J /mwa-1165080856/cal/1165092496/rts/DI_JonesMatrices_node024.dat \
+  -B /mwa-1165080856/cal/1165092496/rts/BandpassCalibration_node024.dat \
+  -W 10000
+
+  docker run --gpus all cirapulsarsandtransients/vcstools:master make_beam
+
+
+
+  docker run \
+    -v /fs:/fs \
+    cirapulsarsandtransients/vcstools:v2.6 \
+    make_beam \
+    -o 1165080856 \
+    -b 1165080863 \
+    -e 1165080865 \
+    -P "06:30:49.40_-28:34:42.77" \
+    -z 2016-12-06T17:34:42 \
+    -d /fs/mwa-1165080856 \
+    -f 132 \
+    -m /fs/mwa-1165080856/cal/1165080856_metafits_ppds.fits \
+    -J /fs/mwa-1165080856/cal/1165092496/rts/DI_JonesMatrices_node024.dat \
+    -B /fs/mwa-1165080856/cal/1165092496/rts/BandpassCalibration_node024.dat \
+    -W 10000
+
+////////
+
+nextflow run beamform.nf --obsid 1272486104 --calid 1272449208 --pointings 19:32:14.05_+10:59:33.38 --all --publish_fits
+nextflow run beamform.nf --obsid 1165080856 --calid 1165092496 --pointings 06:30:49.40_-28:34:42.77 --all --publish_fits
+
+***
+nextflow run beamform.nf --obsid 1165080856 --calid 1165092496 --begin 1165080863 --end 1165080865 --pointings 06:30:49.40_-28:34:42.77 --publish_fits
+find /fs/mwa_base -name "1165*0001.fits" | xargs -i cp {} /fs/mwa_base/1165080856/kguo_work/
+////////
+
+
+//// sample
+nextflow run pulsar_search.nf --obsid 1165080856  --dur 15 --publish_all_prepfold --fits_file /fs/1165080856_06:30:49.40_-28:34:42.77_ch109-132_0001.fits
+
+//// 60s * 100p ////
+nextflow run pulsar_search.nf --obsid 1165080856  --dur 60 --publish_all_prepfold \
+  --fits_file /fs/data060s100p/1165080856_06:40:15.60_-26:41:32.52_ch109-132_0001.fits \
+  -with-trace /fs/trace10.html \
+  -with-timeline /fs/timeline10.html \
+  -with-report /fs/report10.html
+
+//// 600s * 1p ////
+nextflow run pulsar_search.nf --obsid 1165080856  --dur 600 --publish_all_prepfold \
+ --fits_file /fs/data600s001p/1165080856_06:42:34.66_-25:49:34.74_ch109-132_0001.fits \
+ -with-trace /fs/trace11.html \
+ -with-timeline /fs/timeline11.html \
+ -with-report /fs/report11.html
+
+//// 600s * 10p ////
+nextflow run -bg pulsar_search.nf --obsid 1165080856  --dur 600 --publish_all_prepfold \
+ --fits_file /fs/data600s010p/*.fits \
+ -with-trace /fs/trace12.html \
+ -with-timeline /fs/timeline12.html \
+ -with-report /fs/report12.html
+
+//// 600s * 100p ////
+nextflow run   pulsar_search.nf --obsid 1165080856  --dur 600 --publish_all_prepfold \
+ --fits_file /fs/data600s100p/*.fits \
+ -with-trace /fs/trace600s100p-15.html \
+ -with-timeline /fs/timeline600s100p-15.html \
+ -with-report /fs/report600s100p-15.html
+
+
+//// makebeam 600s * 1000p ////
+nextflow run -bg beamform.nf --obsid 1165080856 \
+  --calid 1165092496 --begin 1165080863 --end 1165081399 \
+  --pointing_file /fs/points-1000.txt \
+  --pub lish_fits \
+  -with-trace /fs/trace1000-1.html \
+  -with-timeline /fs/timeline1000-1.html \
+  -with-report /fs/report1000-1.html
+
+
+//////
+centre_freq.txt
+154.24
+
+DDplan.txt
+Blind_1165080856_06:42:34.66_-25:49:34.74,1,13.26,0.02,613,0.1,1,4
+Blind_1165080856_06:42:34.66_-25:49:34.74,13.26,26.53,0.03,442,0.2,2,8
+Blind_1165080856_06:42:34.66_-25:49:34.74,26.53,53.05,0.06,441,0.4,4,16
+Blind_1165080856_06:42:34.66_-25:49:34.74,53.05,106.1,0.12,442,0.8,8,32
+Blind_1165080856_06:42:34.66_-25:49:34.74,106.1,212.2,0.25,424,1.6,16,64
+Blind_1165080856_06:42:34.66_-25:49:34.74,212.2,250,0.5,75,3.2,16,64
+
+
